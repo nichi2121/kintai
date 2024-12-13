@@ -11,14 +11,16 @@
         int year = (int) request.getAttribute("year");
         int month = (int) request.getAttribute("month");
         String date = request.getParameter("date");
-        Map<String, String> events = (Map<String, String>) request.getAttribute("events");
-        Map<String, Boolean> vacations = (Map<String, Boolean>) request.getAttribute("vacations");
+
+        // イベントと休暇情報を取得
+        String event = (String) request.getAttribute("event");
+        String vacation = (String) request.getAttribute("vacation");
     %>
 
     <h2><%= year %>年<%= month + 1 %>月<%= date %>日のイベント</h2>
     
     <!-- 休暇申請フォーム -->
-    <form action="CalendarServlet" method="get" onsubmit="return confirm('休暇申請を行います。よろしいですか？');">
+    <form action="eventServlet" method="get" onsubmit="return confirm('休暇申請を行います。よろしいですか？');">
         <input type="hidden" name="year" value="<%= year %>">
         <input type="hidden" name="month" value="<%= month %>">
         <input type="hidden" name="date" value="<%= date %>">
@@ -29,7 +31,7 @@
     </form>
 
     <!-- イベント追加フォーム -->
-    <form action="CalendarServlet" method="get">
+    <form action="eventServlet" method="get">
         <input type="hidden" name="year" value="<%= year %>">
         <input type="hidden" name="month" value="<%= month %>">
         <input type="hidden" name="date" value="<%= date %>">
@@ -42,13 +44,24 @@
         <input type="submit" value="追加">
     </form>
 
+    <!-- イベント表示 -->
     <h3>登録されたイベント:</h3>
-    <% 
-        String eventKey = year + "-" + (month + 1) + "-" + date;
-        String event = events.getOrDefault(eventKey, "なし");
-    %>
-    <p><%= event %></p>
+    <p><%= (event != null && !event.equals("なし")) ? event : "イベントは登録されていません" %></p>
 
+    <!-- 休暇情報表示 -->
+    <h3>休暇申請:</h3>
+    <p><%= (vacation != null && !vacation.equals("なし")) ? vacation : "休暇申請はありません" %></p>
+
+    <!-- イベント削除フォーム -->
+    <form action="eventServlet" method="get" onsubmit="return confirm('このイベントを削除します。よろしいですか？');">
+        <input type="hidden" name="year" value="<%= year %>">
+        <input type="hidden" name="month" value="<%= month %>">
+        <input type="hidden" name="date" value="<%= date %>">
+        <input type="hidden" name="deleteEvent" value="true">
+        <button type="submit">イベント削除</button>
+    </form>
+
+    <br>
     <a href="CalendarServlet?year=<%= year %>&month=<%= month %>">カレンダーに戻る</a>
 </body>
 </html>
