@@ -34,6 +34,16 @@ public class EventServlet extends HttpServlet {
             }
         }
 
+        // 休暇申請の追加
+        String vacationReason = request.getParameter("reason");
+        if (vacationReason != null && !vacationReason.isEmpty()) {
+            try {
+                eventDAO.addVacation(String.valueOf(year), String.valueOf(month + 1), date, vacationReason);
+            } catch (SQLException e) {
+                e.printStackTrace(); // エラーハンドリング
+            }
+        }
+
         // 削除ボタンが押された場合
         if ("true".equals(request.getParameter("deleteEvent"))) {
             try {
@@ -43,19 +53,22 @@ public class EventServlet extends HttpServlet {
             }
         }
 
-        // イベントを取得
+        // イベントと休暇申請を取得
         String event = null;
+        String vacation = null;
         try {
             event = eventDAO.getEvent(String.valueOf(year), String.valueOf(month + 1), date);
+            vacation = eventDAO.getVacation(String.valueOf(year), String.valueOf(month + 1), date);
         } catch (SQLException e) {
             e.printStackTrace(); // エラーハンドリング
         }
 
-        // リクエストにイベント情報をセット
+        // リクエストにイベントと休暇申請情報をセット
         request.setAttribute("year", year);
         request.setAttribute("month", month);
         request.setAttribute("date", date);
         request.setAttribute("event", event);
+        request.setAttribute("vacation", vacation);
 
         // イベント表示用のJSPにフォワード
         RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/event.jsp");
